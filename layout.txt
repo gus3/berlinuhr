@@ -1,0 +1,69 @@
+The "Berlin Clock" (Mengenlehreuhr) as a
+screen-hack.
+
+  12345678901
+1      o
+2 [] [] [] []
+3 [] [] [] []
+4 ooXooXooXoo
+5 [] [] [] []
+
+[] = double cell
+X = single cell, red
+o = single cell, yellow
+
+second and third rows are hours
+fourth and fifth rows are minutes
+
+hours and minutes are integers
+
+first row, flashes seconds, light = (seconds+1)%2
+
+second row, five hours: lights = hours/5
+
+third row, one hour: lights = hours%5
+
+fourth row, five minutes: lights = minutes/5
+
+fifth row, one minute: lights = minutes%5
+
+So, minutes below, hour above, but the flasher on top.
+
+Without a border, the clock "digits" are an 11x5 array.
+N.B.: When printing to an (n)curses window, the line
+comes first, then the column: (Y,X), not (X,Y).
+
+Using (n)curses will simplify both positioning management
+and color management. No need to access termcap/terminfo
+in the program's code. The smart approach will be to use
+A_BOLD in the attributes, as it can be color-independent
+and even support monochrome terminals.
+
+#include <curses.h>
+
+0,0 is the top-left (home). The 11x5 window's limit is
+LINES-6,COLS-12. The extra subtraction is to avoid wrap-
+around.
+
+The starting position may be anywhere within the viewable
+display, but in the event of SIGWINCH (window size change)
+the new position should be set to 0,0. But, if the
+(n)curses library catches SIGWINCH and updates LINES and
+COLS appropriately (TODO: investigate) the simple math may
+still apply; a window change may reset the new position to
+a random, in-window value.
+
+From the ncurses documentation:
+
+"A resize operation in X sends SIGWINCH to the application running
+under xterm. The easiest way to handle SIGWINCH is to do an endwin,
+followed by an refresh and a screen repaint you code yourself. The
+refresh will pick up the new screen size from the xterm's environment."
+
+This matters in X, but not in a console terminal. A console
+terminal's size doesn't change on its own. HOWEVER, screen(1)
+may detach from a display of one size and re-attach to a 
+display of another size. This also causes a SIGWINCH.
+
+If terminal has color, use it, otherwise just use A_BOLD for "on"
+and no bold for "off."
