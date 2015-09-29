@@ -53,9 +53,6 @@ static void init_colors(void) {
 		exit(2);
 	}
 
-	/* make COLOR_WHITE a 15% grey (when supported) */
-	init_color(COLOR_WHITE, 150, 150, 150);
-	
 	if (color) {
 		init_pair(RED, COLOR_RED, COLOR_BLACK);
 		init_pair(YELLOW, COLOR_YELLOW, COLOR_BLACK);
@@ -97,21 +94,21 @@ static void show_uhr(int h, int m, int s) {
 	UHRPUT(0, 5, "o");
 
 	for (i = 0; i < 4; i++) {
-		UHRCOLOR(i + 1 > h1light ? OFF : RED);
+		UHRCOLOR(i >= h1light ? OFF : RED);
 		UHRPUT(1, i * 3, "[]");
 	}
 	for (i = 0; i < 4; i++) {
-		UHRCOLOR(i + 1 > h2light ? OFF : RED);
+		UHRCOLOR(i >= h2light ? OFF : RED);
 		UHRPUT(2, i * 3, "[]");
 	}
 	/* The five-minute line varies in color */
 	for (i = 0; i < 11; i++) {
-		UHRCOLOR(i + 1 > m1light ? OFF : (i + 1) % 3 == 0 ? RED : YELLOW);
+		UHRCOLOR(i >= m1light ? OFF : (i + 1) % 3 == 0 ? RED : YELLOW);
 		/* Yes, the nested conditionals actually work in this macro! */
 		UHRPUT(3, i, "|");
 	}
 	for (i = 0; i < 4; i++) {
-		UHRCOLOR(i + 1 > m2light ? OFF : YELLOW);
+		UHRCOLOR(i >= m2light ? OFF : YELLOW);
 		UHRPUT(4, i * 3, "[]");
 	}
 	/* check boundaries */
